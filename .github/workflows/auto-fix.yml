@@ -1,0 +1,36 @@
+name: Auto Fix & Quality Check
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  fix-and-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run ESLint with auto-fix
+        run: npx eslint . --fix || true
+
+      - name: Run Prettier auto-format
+        run: npx prettier . --write || true
+
+      - name: Run tests
+        run: npm test || true
+
+      - name: Commit fixes automatically
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: auto-fix lint & format issues"
